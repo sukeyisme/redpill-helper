@@ -71,7 +71,6 @@ jobs:
           
       - name: upload image
         uses: actions/upload-artifact@main
-        if: steps.generate.outputs.GENERATE_STATUS == 'success'
         with:
           name: dsm
           path: images/*.img
