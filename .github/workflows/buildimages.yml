@@ -68,23 +68,11 @@ jobs:
       - name: create ds3615xs 7.0.1 image
         run: |
           ./rp-helper.sh auto bromolow-7.0.1-42218
-
-      - name: upload images to Wetrans
-        env: 
-          WXPUSH_TOKEN: ${{ secrets.WXPUSH_TOKEN}}
-          WXPUSER_UID: ${{ secrets.WXPUSER_UID }}
-          PUSHPLUS_TOKEN: ${{ secrets.PUSHPLUS_TOKEN }}
-        run: |
-          sudo mkdir firmware
-          sudo mv -f images/*.img firmware/
-          curl -sL https://git.io/file-transfer | sh 
-          wetrans=$(./transfer wet -s -p 16 --no-progress firmware/)
-          wetrans=$(echo $wetrans | grep -o -E "https[^ ]*")
-          sudo curl -G "http://wxpusher.zjiecode.com/api/send/message/?appToken=${WXPUSH_TOKEN}&uid=${WXPUSER_UID}" \
-            --data-urlencode "content=$wetrans" > /dev/null
-          sudo curl -G "http://www.pushplus.plus/send" \
-            -H "Content-Type=application/json" \
-            --data-urlencode "token=${PUSHPLUS_TOKEN}" \
-            --data-urlencode "title=image file download url" \
-            --data-urlencode "content=$wetrans" > /dev/null
+          
+      - name: upload image
+        uses: actions/upload-artifact@main
+        if: steps.generate.outputs.GENERATE_STATUS == 'success'
+        with:
+          name: dsm
+          path: images/*.img
           
